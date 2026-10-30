@@ -59,13 +59,39 @@ d'`account-service` et de `transaction-service` (client MCP Streamable HTTP), av
 - `GET /api/chat/tools` : tools MCP découverts. Swagger : http://localhost:8083/swagger-ui.html
 - Scénarios : [`http/partie-e.http`](http/partie-e.http)
 
+## Données : `bank_transactions.csv`
+Le jeu de données fourni (5000 transactions, 988 comptes `ACC0001`...) est importé au démarrage :
+- `account-service` (`bootstrap/CsvAccountLoader`) : un compte par `account_id` (référence client = `ACC0090`,
+  devise EUR, statut ACTIVE), en plus des 4 comptes de démonstration `CUST-00x` ;
+- `transaction-service` (`bootstrap/CsvTransactionLoader`) : l'historique des 5000 transactions.
+
+Les UUID sont dérivés des identifiants du CSV (`UUID.nameUUIDFromBytes`), donc identiques dans les deux services.
+Exemple : `ACC0090` → `b093de82-61bf-3486-8617-37378b930bc6`. Désactivation : `bank.seed.csv.enabled=false`.
+Le même fichier sert au notebook de la partie H (`fraud-detection/data/bank_transactions.csv`).
+
+## Partie F : communication asynchrone avec Kafka
+- **Producteur** (`transaction-service`, package `messaging/`) : après le commit d'une transaction en base
+  (`@TransactionalEventListener(AFTER_COMMIT)`), un événement `TransactionCreated` est publié dans le topic
+  `bank.transactions.created` (3 partitions) avec **`accountId` comme clé** : les événements d'un même compte
+  restent ordonnés dans la même partition. Une transaction refusée ou annulée ne publie rien.
+- **Consumer** (`notification-service`, port 8084, groupe `notification-service`) : `@KafkaListener` qui
+  journalise chaque événement (console + `logs/notification-service.log`) sans modifier les données bancaires.
+  `GET http://localhost:8084/api/notifications/events` : derniers événements reçus.
+- **Broker** : `docker compose up -d` lance Kafka (KRaft, `localhost:9092`) et Kafka UI (http://localhost:8090).
+
+```json
+{ "eventId": "UUID", "eventType": "TransactionCreated", "transactionId": "UUID", "accountId": "UUID",
+  "amount": 250.00, "currency": "EUR", "occurredAt": "2026-01-15T10:30:00Z" }
+```
+Scénarios : [`http/partie-f.http`](http/partie-f.http).
+
 ## Avancement
 - [x] Partie A : préparation (projet Maven multi-modules)
 - [x] Partie B : conception et architecture
 - [x] Partie C : micro-services fonctionnels (REST, GraphQL, MCP, OpenFeign, Resilience4J)
 - [x] Partie D : micro-services techniques (Gateway, Eureka, Config)
 - [x] Partie E : chatbot agentique
-- [ ] Partie F : communication asynchrone avec Kafka
+- [x] Partie F : communication asynchrone avec Kafka
 - [ ] Partie G : client web Angular
 - [ ] Partie H : IA avec Python (détection de fraude)
 - [ ] Partie I : DevOps

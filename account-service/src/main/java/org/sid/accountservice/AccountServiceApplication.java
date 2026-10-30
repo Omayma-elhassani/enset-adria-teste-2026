@@ -22,7 +22,7 @@ public class AccountServiceApplication {
     @Bean
     CommandLineRunner initAccounts(AccountRepository accountRepository) {
         return args -> {
-            if (accountRepository.count() > 0) return;
+            if (accountRepository.existsById(UUID.fromString("11111111-1111-1111-1111-111111111111"))) return;
             accountRepository.saveAll(List.of(
                     Account.builder().id(UUID.fromString("11111111-1111-1111-1111-111111111111"))
                             .customerReference("CUST-001").status(AccountStatus.ACTIVE).currency("MAD").balance(15000).build(),

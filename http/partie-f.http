@@ -1,0 +1,26 @@
+### ===== Partie F : Kafka =====
+# Prerequis : docker compose up -d (Kafka sur localhost:9092, Kafka UI sur http://localhost:8090)
+# puis account-service, transaction-service et notification-service demarres.
+
+### 1. Transaction valide -> evenement TransactionCreated publie (cle = accountId)
+POST http://localhost:8082/api/transactions
+Content-Type: application/json
+
+{ "accountId": "33333333-3333-3333-3333-333333333333", "amount": 250.00, "currency": "EUR",
+  "type": "DEBIT", "merchantCategory": "TRAVEL", "country": "FR" }
+
+### 2. Virement -> 2 evenements (DEBIT sur le compte 1, CREDIT sur le compte 2)
+POST http://localhost:8082/api/transactions/transfer
+Content-Type: application/json
+
+{ "fromAccountId": "11111111-1111-1111-1111-111111111111",
+  "toAccountId": "22222222-2222-2222-2222-222222222222", "amount": 300, "currency": "MAD" }
+
+### 3. Transaction refusee (plafond) -> aucune persistance, donc aucun evenement
+POST http://localhost:8082/api/transactions
+Content-Type: application/json
+
+{ "accountId": "11111111-1111-1111-1111-111111111111", "amount": 5000, "currency": "MAD" }
+
+### 4. Evenements recus et journalises par le consumer
+GET http://localhost:8084/api/notifications/events

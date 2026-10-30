@@ -42,3 +42,9 @@ Content-Type: application/json
 
 ### 8. Via la Gateway
 GET http://localhost:8888/api/chat?message=Liste tous les comptes bloqués
+
+### Donnees du CSV (bank_transactions.csv) : compte ACC0090 (7 transactions, solde 2780 EUR)
+POST http://localhost:8083/api/chat
+Content-Type: application/json
+
+{ "conversationId": "demo-csv", "message": "Quel est le solde du client ACC0090 et quelles sont ses dernières transactions ?" }

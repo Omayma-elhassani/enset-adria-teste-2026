@@ -29,7 +29,7 @@ public class AccountMcpTools {
         return accountService.findById(UUID.fromString(accountId));
     }
 
-    @McpTool(name = "getCustomerAccounts", description = "Lister les comptes d'un client à partir de sa référence client (ex: CUST-001)")
+    @McpTool(name = "getCustomerAccounts", description = "Lister les comptes d'un client à partir de sa référence client (ex: CUST-001 ou ACC0090)")
     public List<AccountDTO> getCustomerAccounts(@McpToolParam(description = "Référence du client") String customerReference) {
         return accountService.findByCustomer(customerReference);
     }

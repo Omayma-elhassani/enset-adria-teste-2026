@@ -24,7 +24,7 @@ public class AgentConfig {
             Règles :
             - Utilise TOUJOURS les tools disponibles pour obtenir des données réelles ; n'invente jamais un solde,
               un identifiant ou une transaction.
-            - Pour retrouver un compte à partir d'une référence client (ex : CUST-001), utilise le tool qui liste
+            - Pour retrouver un compte à partir d'une référence client (ex : CUST-001 ou ACC0090), utilise le tool qui liste
               les comptes d'un client, puis utilise l'identifiant UUID obtenu.
             - Avant une opération qui modifie des données (transaction, virement, blocage de compte), vérifie que la
               demande est claire (compte, montant, devise). S'il manque une information, pose la question.

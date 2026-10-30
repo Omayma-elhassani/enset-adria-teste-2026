@@ -41,3 +41,7 @@ __pycache__/
 
 ### Fichiers de l application Claude ###
 Claude outputs/
+
+### Logs ###
+logs/
+*.log

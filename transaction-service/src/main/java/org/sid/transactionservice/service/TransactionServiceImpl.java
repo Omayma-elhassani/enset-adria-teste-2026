@@ -13,7 +13,9 @@ import org.sid.transactionservice.dto.TransactionRequest;
 import org.sid.transactionservice.dto.TransferRequest;
 import org.sid.transactionservice.exception.BusinessException;
 import org.sid.transactionservice.exception.TransactionNotFoundException;
+import org.sid.transactionservice.messaging.TransactionCreatedEvent;
 import org.sid.transactionservice.repository.TransactionRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +33,7 @@ public class TransactionServiceImpl implements TransactionService {
     private final TransactionRepository transactionRepository;
     private final AccountRestClient accountRestClient;
     private final BankTransactionProperties properties;
+    private final ApplicationEventPublisher eventPublisher;
 
     /**
      * Règles métier :
@@ -50,7 +53,6 @@ public class TransactionServiceImpl implements TransactionService {
         Transaction saved = save(request.accountId(), request.amount(), request.currency(), type,
                 request.merchantCategory(), request.country());
         accountRestClient.updateBalance(account.id(), new BalanceUpdateRequest(signedDelta(type, request.amount())));
-        // Partie F : publication de l'événement TransactionCreated dans Kafka
         return toDTO(saved);
     }
 
@@ -138,9 +140,14 @@ public class TransactionServiceImpl implements TransactionService {
 
     // ---------------------------------------------------------------- utilitaires
 
+    /**
+     * Enregistre la transaction et prépare l'événement TransactionCreated (partie F).
+     * L'événement n'est envoyé à Kafka qu'après le commit (TransactionEventPublisher, AFTER_COMMIT) :
+     * si la transaction est annulée (rollback), rien n'est publié.
+     */
     private Transaction save(UUID accountId, BigDecimal amount, String currency, TransactionType type,
                              String merchantCategory, String country) {
-        return transactionRepository.save(Transaction.builder()
+        Transaction saved = transactionRepository.save(Transaction.builder()
                 .id(UUID.randomUUID())
                 .accountId(accountId)
                 .amount(amount)
@@ -150,6 +157,8 @@ public class TransactionServiceImpl implements TransactionService {
                 .country(country)
                 .createdAt(Instant.now())
                 .build());
+        eventPublisher.publishEvent(TransactionCreatedEvent.from(saved));
+        return saved;
     }
 
     private double signedDelta(TransactionType type, BigDecimal amount) {
