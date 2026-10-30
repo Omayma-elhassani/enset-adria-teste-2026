@@ -1,0 +1,44 @@
+### Pre-requis : discovery, config, account-service, transaction-service demarres AVANT chatbot-service
+### et variable d'environnement GEMINI_API_KEY definie dans la configuration de lancement.
+
+### 1. Tools MCP disponibles pour l'agent (doit lister les tools des 2 services)
+GET http://localhost:8083/api/chat/tools
+
+### 2. Consultation : solde d'un client
+POST http://localhost:8083/api/chat
+Content-Type: application/json
+
+{ "conversationId": "demo-1", "message": "Quel est le solde des comptes du client CUST-001 ?" }
+
+### 3. Operation : transaction (meme conversation -> l'agent se souvient du compte)
+POST http://localhost:8083/api/chat
+Content-Type: application/json
+
+{ "conversationId": "demo-1", "message": "Enregistre un paiement de 120 MAD chez un restaurant au Maroc sur ce compte." }
+
+### 4. Virement
+POST http://localhost:8083/api/chat
+Content-Type: application/json
+
+{ "conversationId": "demo-1", "message": "Fais un virement de 300 MAD du client CUST-001 vers le client CUST-002." }
+
+### 5. Historique
+POST http://localhost:8083/api/chat
+Content-Type: application/json
+
+{ "conversationId": "demo-1", "message": "Montre-moi les dernières transactions de CUST-001." }
+
+### 6. Regle metier refusee : plafond depasse
+POST http://localhost:8083/api/chat
+Content-Type: application/json
+
+{ "conversationId": "demo-2", "message": "Fais un paiement de 5000 MAD depuis le compte du client CUST-001." }
+
+### 7. Regle metier refusee : compte bloque
+POST http://localhost:8083/api/chat
+Content-Type: application/json
+
+{ "conversationId": "demo-3", "message": "Débite 100 MAD du compte du client CUST-004." }
+
+### 8. Via la Gateway
+GET http://localhost:8888/api/chat?message=Liste tous les comptes bloqués

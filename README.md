@@ -18,7 +18,7 @@ Plateforme bancaire qui permet de consulter des comptes, d'enregistrer des trans
 | `config-service` | Configuration centralisée (Spring Cloud Config) | 9999 |
 | `discovery-service` | Annuaire Eureka | 8761 |
 | `gateway-service` | Point d'entrée unique (Spring Cloud Gateway) | 8888 |
-| `account-service` | Gestion des comptes bancaires | 8081 |
+| `account-service` | Gestion des comptes bancaires | 8085 |
 | `transaction-service` | Enregistrement et consultation des transactions | 8082 |
 | `chatbot-service` | Agent IA (Spring AI, client MCP) | 8083 |
 | `notification-service` | Consumer Kafka des événements de transaction | 8084 |
@@ -32,7 +32,7 @@ Les contrôleurs REST, GraphQL et MCP appellent tous la même couche `service`.
 ## Partie C : endpoints
 | Service | REST / Swagger | GraphQL | MCP |
 |---|---|---|---|
-| account-service | http://localhost:8081/swagger-ui.html | http://localhost:8081/graphiql | POST http://localhost:8081/mcp |
+| account-service | http://localhost:8085/swagger-ui.html | http://localhost:8085/graphiql | POST http://localhost:8085/mcp |
 | transaction-service | http://localhost:8082/swagger-ui.html | http://localhost:8082/graphiql | POST http://localhost:8082/mcp |
 
 Comptes de test : `11111111-...` (MAD, 15000), `22222222-...` (MAD, 3000), `33333333-...` (EUR, 2500),
@@ -49,12 +49,22 @@ Ordre de démarrage : `discovery-service` → `config-service` → `account-serv
 
 Scénarios de test : [`http/partie-d.http`](http/partie-d.http).
 
+## Partie E : chatbot agentique
+`chatbot-service` (port 8083) : agent Spring AI connecté à **Google Gemini**. Il utilise comme tools les serveurs MCP
+d'`account-service` et de `transaction-service` (client MCP Streamable HTTP), avec une mémoire par conversation.
+
+- Clé Gemini gratuite : https://aistudio.google.com/apikey, à mettre dans la variable d'environnement `GEMINI_API_KEY`
+  (jamais dans le code).
+- `POST /api/chat` `{ "conversationId": "demo-1", "message": "Quel est le solde de CUST-001 ?" }`
+- `GET /api/chat/tools` : tools MCP découverts. Swagger : http://localhost:8083/swagger-ui.html
+- Scénarios : [`http/partie-e.http`](http/partie-e.http)
+
 ## Avancement
 - [x] Partie A : préparation (projet Maven multi-modules)
 - [x] Partie B : conception et architecture
 - [x] Partie C : micro-services fonctionnels (REST, GraphQL, MCP, OpenFeign, Resilience4J)
 - [x] Partie D : micro-services techniques (Gateway, Eureka, Config)
-- [ ] Partie E : chatbot agentique
+- [x] Partie E : chatbot agentique
 - [ ] Partie F : communication asynchrone avec Kafka
 - [ ] Partie G : client web Angular
 - [ ] Partie H : IA avec Python (détection de fraude)

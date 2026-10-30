@@ -1,11 +1,11 @@
-### ===== account-service (8081) =====
-GET http://localhost:8081/api/accounts
+### ===== account-service (8085) =====
+GET http://localhost:8085/api/accounts
 
 ###
-GET http://localhost:8081/api/accounts/11111111-1111-1111-1111-111111111111
+GET http://localhost:8085/api/accounts/11111111-1111-1111-1111-111111111111
 
 ###
-POST http://localhost:8081/api/accounts
+POST http://localhost:8085/api/accounts
 Content-Type: application/json
 
 { "customerReference": "CUST-005", "currency": "MAD", "initialBalance": 500 }
@@ -74,13 +74,13 @@ Content-Type: application/json
 { "query": "{ transactionsByAccount(accountId: \"11111111-1111-1111-1111-111111111111\") { id amount currency type createdAt } }" }
 
 ###
-POST http://localhost:8081/graphql
+POST http://localhost:8085/graphql
 Content-Type: application/json
 
 { "query": "{ accounts { id customerReference status currency balance } }" }
 
 ### ===== MCP : lister les tools (streamable HTTP) =====
-POST http://localhost:8081/mcp
+POST http://localhost:8085/mcp
 Content-Type: application/json
 Accept: application/json, text/event-stream
 
