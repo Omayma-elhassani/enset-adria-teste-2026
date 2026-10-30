@@ -38,11 +38,22 @@ Les contrôleurs REST, GraphQL et MCP appellent tous la même couche `service`.
 Comptes de test : `11111111-...` (MAD, 15000), `22222222-...` (MAD, 3000), `33333333-...` (EUR, 2500),
 `44444444-...` (MAD, BLOCKED). Scénarios de test : [`http/partie-c.http`](http/partie-c.http).
 
+## Partie D : services techniques
+Ordre de démarrage : `discovery-service` → `config-service` → `account-service` → `transaction-service` → `gateway-service`.
+
+- Eureka : http://localhost:8761
+- Config Server : http://localhost:9999/transaction-service/default (`bank.transaction.max-amount=1000`,
+  fichier `config-service/src/main/resources/config-repo/transaction-service.properties`)
+- Gateway : http://localhost:8888/api/accounts, http://localhost:8888/api/transactions
+  (et routes dynamiques `http://localhost:8888/<service>/...`)
+
+Scénarios de test : [`http/partie-d.http`](http/partie-d.http).
+
 ## Avancement
 - [x] Partie A : préparation (projet Maven multi-modules)
 - [x] Partie B : conception et architecture
 - [x] Partie C : micro-services fonctionnels (REST, GraphQL, MCP, OpenFeign, Resilience4J)
-- [ ] Partie D : micro-services techniques (Gateway, Eureka, Config)
+- [x] Partie D : micro-services techniques (Gateway, Eureka, Config)
 - [ ] Partie E : chatbot agentique
 - [ ] Partie F : communication asynchrone avec Kafka
 - [ ] Partie G : client web Angular
