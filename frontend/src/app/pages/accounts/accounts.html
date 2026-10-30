@@ -1,0 +1,70 @@
+<div class="page-header">
+  <div>
+    <h1>Comptes bancaires</h1>
+    <p class="muted">Données d'account-service (via la Gateway)</p>
+  </div>
+  <button class="btn primary" (click)="showForm.set(!showForm())">
+    {{ showForm() ? 'Fermer' : '+ Nouveau compte' }}
+  </button>
+</div>
+
+<div class="stats">
+  <div class="stat"><span class="stat-label">Comptes</span><span class="stat-value">{{ accounts().length }}</span></div>
+  <div class="stat"><span class="stat-label">Actifs</span><span class="stat-value ok">{{ activeCount() }}</span></div>
+  <div class="stat"><span class="stat-label">Bloqués</span><span class="stat-value danger">{{ blockedCount() }}</span></div>
+</div>
+
+@if (error()) { <div class="alert error">{{ error() }}</div> }
+@if (success()) { <div class="alert success">{{ success() }}</div> }
+
+@if (showForm()) {
+  <form class="card form-grid" [formGroup]="form" (ngSubmit)="create()">
+    <h2>Créer un compte</h2>
+    <label>Référence client <input formControlName="customerReference" placeholder="CUST-005" /></label>
+    <label>Devise <input formControlName="currency" maxlength="3" placeholder="MAD" /></label>
+    <label>Solde initial <input type="number" formControlName="initialBalance" min="0" /></label>
+    <button class="btn primary" type="submit" [disabled]="form.invalid">Créer</button>
+  </form>
+}
+
+<div class="card">
+  <div class="toolbar">
+    <input class="search" placeholder="Rechercher une référence client (ex : ACC0090, CUST-001)…"
+           [value]="search()" (input)="onSearch($any($event.target).value)" />
+    <select [value]="statusFilter()" (change)="onStatus($any($event.target).value)">
+      <option value="ALL">Tous les statuts</option>
+      <option value="ACTIVE">Actifs</option>
+      <option value="BLOCKED">Bloqués</option>
+    </select>
+  </div>
+
+  @if (loading()) {
+    <p class="muted">Chargement…</p>
+  } @else {
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>Référence client</th><th>Statut</th><th>Devise</th><th class="num">Solde</th><th></th></tr>
+        </thead>
+        <tbody>
+          @for (a of pageItems(); track a.id) {
+            <tr>
+              <td><strong>{{ a.customerReference }}</strong><div class="mono muted small">{{ a.id }}</div></td>
+              <td><span class="badge" [class.ok]="a.status === 'ACTIVE'" [class.danger]="a.status === 'BLOCKED'">{{ a.status }}</span></td>
+              <td>{{ a.currency }}</td>
+              <td class="num">{{ a.balance | number: '1.2-2' }}</td>
+              <td class="num"><a class="btn small" [routerLink]="['/accounts', a.id]">Détails</a></td>
+            </tr>
+          } @empty {
+            <tr><td colspan="5" class="muted">Aucun compte trouvé.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <div class="pager">
+      <button class="btn small" [disabled]="page() === 0" (click)="page.set(page() - 1)">‹ Précédent</button>
+      <span class="muted">Page {{ page() + 1 }} / {{ pageCount() }} · {{ filtered().length }} comptes</span>
+      <button class="btn small" [disabled]="page() + 1 >= pageCount()" (click)="page.set(page() + 1)">Suivant ›</button>
+    </div>
+  }
+</div>

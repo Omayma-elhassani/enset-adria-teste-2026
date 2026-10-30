@@ -1,0 +1,41 @@
+<div class="page-header">
+  <div>
+    <h1>Virement</h1>
+    <p class="muted">DEBIT sur le compte source + CREDIT sur le compte destination (même devise)</p>
+  </div>
+</div>
+
+@if (error()) { <div class="alert error">{{ error() }}</div> }
+@if (result().length) {
+  <div class="alert success">
+    Virement effectué : {{ result().length }} transactions créées
+    (DEBIT {{ result()[0].id.slice(0, 8) }}…, CREDIT {{ result()[1]?.id?.slice(0, 8) }}…)
+  </div>
+}
+
+<form class="card" [formGroup]="form" (ngSubmit)="submit()">
+  <div class="grid-2">
+    <div class="form-grid">
+      <h2>Compte source</h2>
+      <label>Référence client
+        <span class="inline"><input formControlName="fromReference" /><button type="button" class="btn small" (click)="lookup('from')">Rechercher</button></span>
+      </label>
+      @if (from(); as a) {
+        <div class="account-pill">{{ a.customerReference }} · {{ a.status }} · <strong>{{ a.balance | number: '1.2-2' }} {{ a.currency }}</strong></div>
+      }
+    </div>
+    <div class="form-grid">
+      <h2>Compte destination</h2>
+      <label>Référence client
+        <span class="inline"><input formControlName="toReference" /><button type="button" class="btn small" (click)="lookup('to')">Rechercher</button></span>
+      </label>
+      @if (to(); as a) {
+        <div class="account-pill">{{ a.customerReference }} · {{ a.status }} · <strong>{{ a.balance | number: '1.2-2' }} {{ a.currency }}</strong></div>
+      }
+    </div>
+  </div>
+  <div class="form-grid narrow">
+    <label>Montant {{ from()?.currency ?? '' }} <input type="number" step="0.01" formControlName="amount" /></label>
+    <button class="btn primary" type="submit" [disabled]="!from() || !to() || form.invalid">Effectuer le virement</button>
+  </div>
+</form>

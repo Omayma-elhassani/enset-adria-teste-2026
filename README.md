@@ -85,6 +85,15 @@ Le même fichier sert au notebook de la partie H (`fraud-detection/data/bank_tra
 ```
 Scénarios : [`http/partie-f.http`](http/partie-f.http).
 
+## Partie G : client web Angular
+Dossier [`frontend/`](frontend) : Angular 22 (standalone + signals), appels REST via la Gateway (8888).
+Pages : comptes (recherche, filtres, création), détail d'un compte (historique, nouvelle transaction, blocage),
+virement, assistant IA (chatbot) et événements Kafka.
+
+```bash
+cd frontend && npm install && npm start   # http://localhost:4200
+```
+
 ## Avancement
 - [x] Partie A : préparation (projet Maven multi-modules)
 - [x] Partie B : conception et architecture
@@ -92,6 +101,6 @@ Scénarios : [`http/partie-f.http`](http/partie-f.http).
 - [x] Partie D : micro-services techniques (Gateway, Eureka, Config)
 - [x] Partie E : chatbot agentique
 - [x] Partie F : communication asynchrone avec Kafka
-- [ ] Partie G : client web Angular
+- [x] Partie G : client web Angular
 - [ ] Partie H : IA avec Python (détection de fraude)
 - [ ] Partie I : DevOps

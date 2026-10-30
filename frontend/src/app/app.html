@@ -1,0 +1,16 @@
+<header class="topbar">
+  <a class="brand" routerLink="/accounts">
+    <span class="logo">B</span>
+    <span>Banque ADRIA</span>
+  </a>
+  <nav>
+    <a routerLink="/accounts" routerLinkActive="active">Comptes</a>
+    <a routerLink="/transfer" routerLinkActive="active">Virement</a>
+    <a routerLink="/chat" routerLinkActive="active">Assistant IA</a>
+    <a routerLink="/events" routerLinkActive="active">Événements Kafka</a>
+  </nav>
+</header>
+
+<main class="container">
+  <router-outlet />
+</main>
