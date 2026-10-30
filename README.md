@@ -29,10 +29,19 @@ Chaque micro-service métier respecte la séparation des couches :
 `domain/`, `repository/`, `service/`, `web/rest/`, `web/graphql/`, `mcp/`.
 Les contrôleurs REST, GraphQL et MCP appellent tous la même couche `service`.
 
+## Partie C : endpoints
+| Service | REST / Swagger | GraphQL | MCP |
+|---|---|---|---|
+| account-service | http://localhost:8081/swagger-ui.html | http://localhost:8081/graphiql | POST http://localhost:8081/mcp |
+| transaction-service | http://localhost:8082/swagger-ui.html | http://localhost:8082/graphiql | POST http://localhost:8082/mcp |
+
+Comptes de test : `11111111-...` (MAD, 15000), `22222222-...` (MAD, 3000), `33333333-...` (EUR, 2500),
+`44444444-...` (MAD, BLOCKED). Scénarios de test : [`http/partie-c.http`](http/partie-c.http).
+
 ## Avancement
 - [x] Partie A : préparation (projet Maven multi-modules)
-- [ ] Partie B : conception et architecture
-- [ ] Partie C : micro-services fonctionnels (REST, GraphQL, MCP, OpenFeign, Resilience4J)
+- [x] Partie B : conception et architecture
+- [x] Partie C : micro-services fonctionnels (REST, GraphQL, MCP, OpenFeign, Resilience4J)
 - [ ] Partie D : micro-services techniques (Gateway, Eureka, Config)
 - [ ] Partie E : chatbot agentique
 - [ ] Partie F : communication asynchrone avec Kafka

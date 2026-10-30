@@ -1,0 +1,39 @@
+enum TransactionType { DEBIT CREDIT }
+
+type Transaction {
+    id: ID!
+    accountId: ID!
+    amount: Float!
+    currency: String!
+    type: TransactionType!
+    merchantCategory: String
+    country: String
+    createdAt: String!
+}
+
+input TransactionRequest {
+    accountId: ID!
+    amount: Float!
+    currency: String!
+    type: TransactionType
+    merchantCategory: String
+    country: String
+}
+
+input TransferRequest {
+    fromAccountId: ID!
+    toAccountId: ID!
+    amount: Float!
+    currency: String!
+}
+
+type Query {
+    transactions: [Transaction]
+    transactionById(id: ID!): Transaction
+    transactionsByAccount(accountId: ID!): [Transaction]
+}
+
+type Mutation {
+    createTransaction(input: TransactionRequest!): Transaction
+    transfer(input: TransferRequest!): [Transaction]
+}

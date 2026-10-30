@@ -38,3 +38,6 @@ node_modules/
 .ipynb_checkpoints/
 __pycache__/
 .env
+
+### Fichiers de l application Claude ###
+Claude outputs/

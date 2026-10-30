@@ -18,13 +18,16 @@
     <name>enset-adria-teste-2026</name>
     <description>Plateforme bancaire micro-services (Spring Cloud, Spring AI, Kafka)</description>
 
-    <!-- Les modules sont ajoutés au fur et à mesure des parties C, D, E et F -->
     <modules>
+        <module>account-service</module>
+        <module>transaction-service</module>
     </modules>
 
     <properties>
         <java.version>17</java.version>
         <spring-cloud.version>2025.1.4</spring-cloud.version>
+        <spring-ai.version>2.0.2</spring-ai.version>
+        <springdoc.version>3.2.0</springdoc.version>
     </properties>
 
     <dependencyManagement>
@@ -36,6 +39,18 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            <dependency>
+                <groupId>org.springframework.ai</groupId>
+                <artifactId>spring-ai-bom</artifactId>
+                <version>${spring-ai.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc.version}</version>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -46,6 +61,7 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
                     <configuration>
+                        <parameters>true</parameters>
                         <annotationProcessorPaths>
                             <path>
                                 <groupId>org.projectlombok</groupId>

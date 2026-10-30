@@ -1,0 +1,88 @@
+### ===== account-service (8081) =====
+GET http://localhost:8081/api/accounts
+
+###
+GET http://localhost:8081/api/accounts/11111111-1111-1111-1111-111111111111
+
+###
+POST http://localhost:8081/api/accounts
+Content-Type: application/json
+
+{ "customerReference": "CUST-005", "currency": "MAD", "initialBalance": 500 }
+
+### ===== transaction-service (8082) =====
+# Transaction valide : DEBIT de 250 MAD
+POST http://localhost:8082/api/transactions
+Content-Type: application/json
+
+{ "accountId": "11111111-1111-1111-1111-111111111111", "amount": 250, "currency": "MAD",
+  "type": "DEBIT", "merchantCategory": "GROCERY", "country": "MA" }
+
+### Regle : montant > plafond (1000) -> 400
+POST http://localhost:8082/api/transactions
+Content-Type: application/json
+
+{ "accountId": "11111111-1111-1111-1111-111111111111", "amount": 5000, "currency": "MAD" }
+
+### Regle : montant negatif -> 400
+POST http://localhost:8082/api/transactions
+Content-Type: application/json
+
+{ "accountId": "11111111-1111-1111-1111-111111111111", "amount": -10, "currency": "MAD" }
+
+### Regle : compte bloque -> 400
+POST http://localhost:8082/api/transactions
+Content-Type: application/json
+
+{ "accountId": "44444444-4444-4444-4444-444444444444", "amount": 100, "currency": "MAD" }
+
+### Regle : devise differente -> 400
+POST http://localhost:8082/api/transactions
+Content-Type: application/json
+
+{ "accountId": "33333333-3333-3333-3333-333333333333", "amount": 100, "currency": "MAD" }
+
+### Regle : compte inexistant -> 400
+POST http://localhost:8082/api/transactions
+Content-Type: application/json
+
+{ "accountId": "99999999-9999-9999-9999-999999999999", "amount": 100, "currency": "MAD" }
+
+### Virement de 500 MAD : compte 1 -> compte 2
+POST http://localhost:8082/api/transactions/transfer
+Content-Type: application/json
+
+{ "fromAccountId": "11111111-1111-1111-1111-111111111111",
+  "toAccountId": "22222222-2222-2222-2222-222222222222", "amount": 500, "currency": "MAD" }
+
+### Historique d'un compte
+GET http://localhost:8082/api/transactions?accountId=11111111-1111-1111-1111-111111111111
+
+### Resilience4J : arreter account-service puis relancer cette requete -> 503 (fallback)
+POST http://localhost:8082/api/transactions
+Content-Type: application/json
+
+{ "accountId": "11111111-1111-1111-1111-111111111111", "amount": 50, "currency": "MAD" }
+
+### Etat des circuit breakers
+GET http://localhost:8082/actuator/circuitbreakers
+
+### ===== GraphQL =====
+POST http://localhost:8082/graphql
+Content-Type: application/json
+
+{ "query": "{ transactionsByAccount(accountId: \"11111111-1111-1111-1111-111111111111\") { id amount currency type createdAt } }" }
+
+###
+POST http://localhost:8081/graphql
+Content-Type: application/json
+
+{ "query": "{ accounts { id customerReference status currency balance } }" }
+
+### ===== MCP : lister les tools (streamable HTTP) =====
+POST http://localhost:8081/mcp
+Content-Type: application/json
+Accept: application/json, text/event-stream
+
+{ "jsonrpc": "2.0", "id": 1, "method": "initialize",
+  "params": { "protocolVersion": "2025-06-18", "capabilities": {}, "clientInfo": { "name": "test", "version": "1.0" } } }
